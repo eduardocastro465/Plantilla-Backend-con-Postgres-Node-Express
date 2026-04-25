@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from "../config.js";
 import { asyncHandler, throwError } from '../utils/asyncHandler.js';
 import { ERROR_MESSAGES } from '../constants/errorMessages.js';
-import AuthModel from '../models/auth/auth.model.js';
+import AuthModel from '../models/auth/Auth.model.js';
 
 
 export const verifyToken = asyncHandler(async (req, res, next) => {
