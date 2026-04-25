@@ -1,27 +1,21 @@
-import mysql from 'mysql2/promise';
+import pg from 'pg';
 import 'dotenv/config';
-import { modoProduction, DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } from '../config.js';
+import { modoProduction } from '../config.js';
 import { textoColorido } from '../utils/colorText.js';
 import { LOG_MESSAGES } from '../constants/logMessages.js';
 import { initTables } from './tables/index.js';
 
+const { Client } = pg;
+
 async function initDb() {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
 
   try {
-    const conn = await mysql.createConnection({
-      host: DB_HOST,
-      port: DB_PORT,
-      user: DB_USER,
-      database: DB_NAME,
-      password: DB_PASSWORD,
-      multipleStatements: true
-    });
-
-    await conn.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
-    await conn.query(`USE \`${DB_NAME}\``);
-
-    // Inicializa las tablas
-    await initTables(conn);
+    await client.connect();
+    await initTables(client);
 
     textoColorido(
       LOG_MESSAGES.TABLAS_LISTAS,
@@ -29,14 +23,14 @@ async function initDb() {
       modoProduction
     );
 
-    await conn.end(); // cierra la conexión
   } catch (error) {
-
     textoColorido(
       LOG_MESSAGES.DB_ERROR_INIT(error.message),
       ["rgb(255, 230, 0)", "rgb(180, 100, 0)"],
       modoProduction
     );
+  } finally {
+    await client.end();
   }
 }
 

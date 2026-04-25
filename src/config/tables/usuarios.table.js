@@ -1,53 +1,70 @@
-export const createUsuariosTable = async (conn) => {
-  await conn.query(`
-    CREATE TABLE IF NOT EXISTS tblUsuarios (
-      id        INT AUTO_INCREMENT PRIMARY KEY,
-      foto      VARCHAR(200),
-      usuario   VARCHAR(30) NOT NULL ,
-      email     VARCHAR(100) NOT NULL UNIQUE,
-      password  VARCHAR(255) NOT NULL,
-      activo    BOOLEAN DEFAULT TRUE,
+export const createUsuariosTable = async (client) => {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS tblUsuarios (
+            id          SERIAL PRIMARY KEY,
+            foto        VARCHAR(200),
+            usuario     VARCHAR(30) NOT NULL,
+            email       VARCHAR(100) NOT NULL UNIQUE,
+            password    VARCHAR(255) NOT NULL,
+            activo      BOOLEAN DEFAULT TRUE,
+            rol_id      INT NOT NULL,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            deleted_at  TIMESTAMP DEFAULT NULL,
 
-      rol_id    INT NOT NULL,
+            CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES tblRoles(id)
+        )
+    `);
 
-      created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      deleted_at datetime default null,
-
-      FOREIGN KEY (rol_id) REFERENCES tblRoles(id)
-    )
-  `);
+    await client.query(`
+        DROP TRIGGER IF EXISTS trg_usuarios_updated_at ON tblUsuarios;
+        CREATE TRIGGER trg_usuarios_updated_at
+        BEFORE UPDATE ON tblUsuarios
+        FOR EACH ROW EXECUTE FUNCTION fn_update_updated_at()
+    `);
 };
 
-export const createPerfilUsuarioTable = async (conn) => {
-  await conn.query(`create table if not exists tblPerfil_usuarios (
-      id int auto_increment primary key,
-      usuario_id INT NOT NULL,
-      nombre    VARCHAR(30) NOT NULL,
-      apellido  VARCHAR(50) NOT NULL,
-      edad      INT NOT NULL,
-      telefono  VARCHAR(15) NOT NULL,
+export const createPerfilUsuarioTable = async (client) => {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS tblPerfil_usuarios (
+            id          SERIAL PRIMARY KEY,
+            usuario_id  INT NOT NULL,
+            nombre      VARCHAR(30) NOT NULL,
+            apellido    VARCHAR(50) NOT NULL,
+            edad        INT NOT NULL,
+            telefono    VARCHAR(15) NOT NULL,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-      created_at timestamp default current_timestamp,
-      updated_at timestamp default current_timestamp on update current_timestamp,
+            CONSTRAINT fk_perfil_usuario FOREIGN KEY (usuario_id) REFERENCES tblUsuarios(id) ON DELETE CASCADE
+        )
+    `);
 
-      FOREIGN KEY (usuario_id) REFERENCES tblUsuarios(id) ON DELETE CASCADE
-    )`);
+    await client.query(`
+        DROP TRIGGER IF EXISTS trg_perfil_updated_at ON tblPerfil_usuarios;
+        CREATE TRIGGER trg_perfil_updated_at
+        BEFORE UPDATE ON tblPerfil_usuarios
+        FOR EACH ROW EXECUTE FUNCTION fn_update_updated_at()
+    `);
 };
 
-export const createDispositivosTable = async (conn) => {
-  await conn.query(`create table if not exists tblDispositivos (
-      id int auto_increment primary key,
-      usuario_id INT NOT NULL,
-      dispositivo    VARCHAR(30) NOT NULL,
-      tipo_dispositivo VARCHAR(30) NOT NULL,
-      navegador TEXT NOT NULL,
-      ip_address VARCHAR(45),
-      created_at timestamp default current_timestamp,
+export const createDispositivosTable = async (client) => {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS tblDispositivos (
+            id                  SERIAL PRIMARY KEY,
+            usuario_id          INT NOT NULL,
+            dispositivo         VARCHAR(30) NOT NULL,
+            tipo_dispositivo    VARCHAR(30) NOT NULL,
+            navegador           TEXT NOT NULL,
+            ip_address          VARCHAR(45),
+            created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-      FOREIGN KEY (usuario_id) REFERENCES tblUsuarios(id) ON DELETE CASCADE,
+            CONSTRAINT fk_dispositivo_usuario FOREIGN KEY (usuario_id) REFERENCES tblUsuarios(id) ON DELETE CASCADE
+        )
+    `);
 
-      INDEX idx_usuario_id (usuario_id),
-      INDEX idx_tipo_dispositivo (tipo_dispositivo)
-    )`);
+    await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_dispositivos_usuario_id ON tblDispositivos(usuario_id);
+        CREATE INDEX IF NOT EXISTS idx_dispositivos_tipo ON tblDispositivos(tipo_dispositivo);
+    `);
 };

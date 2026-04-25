@@ -1,11 +1,19 @@
-export const createRolesTable = async (conn) => {
-    await conn.query(`create table if not exists tblRoles (
-        id int auto_increment primary key,
-        rol varchar(30) not null unique,
-        descripcion varchar(250) null,
-        activo boolean default true,
-        created_at timestamp default current_timestamp,
-        updated_at timestamp default current_timestamp on update current_timestamp
-    )`)
+export const createRolesTable = async (client) => {
+    await client.query(`
+        CREATE TABLE IF NOT EXISTS tblRoles (
+            id          SERIAL PRIMARY KEY,
+            rol         VARCHAR(30) NOT NULL UNIQUE,
+            descripcion VARCHAR(250),
+            activo      BOOLEAN DEFAULT TRUE,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
 
+    await client.query(`
+        DROP TRIGGER IF EXISTS trg_roles_updated_at ON tblRoles;
+        CREATE TRIGGER trg_roles_updated_at
+        BEFORE UPDATE ON tblRoles
+        FOR EACH ROW EXECUTE FUNCTION fn_update_updated_at()
+    `);
 };
