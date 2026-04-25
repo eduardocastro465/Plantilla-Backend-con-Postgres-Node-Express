@@ -1,6 +1,6 @@
 import pg from 'pg';
 import 'dotenv/config';
-import { modoProduction } from '../config.js';
+import { modoProduction,DATABASE_URL } from '../config.js';
 import { textoColorido } from '../utils/colorText.js';
 import { LOG_MESSAGES } from '../constants/logMessages.js';
 import { formatearFecha } from '../utils/formateo.js';
@@ -8,7 +8,7 @@ import { formatearFecha } from '../utils/formateo.js';
 const { Pool } = pg;
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 

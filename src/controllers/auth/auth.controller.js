@@ -1,4 +1,4 @@
-import AuthModel from '../../models/auth/auth.model.js';
+import AuthModel from '../../models/auth/Auth.model.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ERROR_MESSAGES } from '../../constants/errorMessages.js';
 import { SUCCESS_MESSAGES } from '../../constants/successMessages.js';
