@@ -1,22 +1,26 @@
 // middlewares/errorHandler.middleware.js
 import { modoProduction } from "../config.js";
-import { ERROR_MESSAGES } from "../constants/errorMessages.js";
+import { ERROR_MESSAGES } from "../constants/errors/errorMessages.erros.js";
 import { logError } from '../utils/logger.js';
+
+function getStatus(error) {
+    if (error.status) return error.status;
+    if (error.name === 'JsonWebTokenError') return 401;
+    if (error.message === ERROR_MESSAGES.CREDENCIALES_INCORRECTAS) return 401;
+    if (error.message?.includes(ERROR_MESSAGES.USUARIO_DESACTIVADO)) return 401;
+    return 500;
+}
 
 export const errorHandler = (error, req, res, next) => {
 
-    const status = error.status ||
-        (error.name === 'JsonWebTokenError' ? 401 :
-            (error.message === ERROR_MESSAGES.CRED_INCORRECTAS ? 401 :
-                (error.message?.includes(ERROR_MESSAGES.USUARIO_INACTIVO) ? 401 : 500)));
+    const status = getStatus(error);
 
     if (!modoProduction) {
         console.error({
             status: 'Error',
             mensaje: error.message,
             ruta: req.originalUrl,
-            metodo: req.method,
-            stack: error.stack
+            metodo: req.method
         });
     }
 

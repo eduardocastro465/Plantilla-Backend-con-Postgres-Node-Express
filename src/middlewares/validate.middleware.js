@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "../constants/errorMessages.js";
+import { ERROR_MESSAGES } from "../constants/errors/errorMessages.erros.js";
 
 // Validar los datos que vienen del cliente
 export const validate = (schema) => (req, res, next) => {

@@ -1,7 +1,7 @@
 import RolesModel from "../../models/auth/Roles.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { ERROR_MESSAGES } from '../../constants/errorMessages.js';
-import { SUCCESS_MESSAGES } from '../../constants/successMessages.js';
+import { ERROR_MESSAGES } from '../../constants/errors/errorMessages.erros.js';
+import { SUCCESS_MESSAGES } from '../../constants/success/successMessages.js';
 
 export const getRoles = asyncHandler(async (req, res) => {
     const roles = await RolesModel.getAll();

@@ -45,7 +45,7 @@ export const logError = async (error, req = null, nivel = 'error') => {
     try {
         await pool.query(
             `INSERT INTO tblLogs (nivel, mensaje, ruta, metodo, status_code, usuario_id, ip, user_agent, body, stack)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
             [
                 logData.nivel,
                 logData.mensaje,
@@ -65,7 +65,7 @@ export const logError = async (error, req = null, nivel = 'error') => {
 
     // Mostrar en consola en desarrollo
     if (modoProduction !== 'production') {
-        console.error(`❌ ${logData.mensaje} | ${logData.ruta || ''} | ${logData.metodo || ''}`);
+        console.error(`ERROR: ${logData.mensaje} | ${logData.ruta || ''} | ${logData.metodo || ''}`);
     }
 };
 
@@ -83,7 +83,7 @@ export const logSimple = async (mensaje, nivel = 'error') => {
     // Guardar en BD
     try {
         await pool.query(
-            `INSERT INTO tblLogs (nivel, mensaje) VALUES (?, ?)`,
+            `INSERT INTO tblLogs (nivel, mensaje) VALUES ($1, $2)`,
             [nivel, mensaje]
         );
     } catch (dbError) {

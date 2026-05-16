@@ -1,8 +1,8 @@
 // usuarios.controller.js
 import UsuarioModel from '../../models/user/Usuario.model.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
-import { ERROR_MESSAGES } from '../../constants/errorMessages.js';
-import { SUCCESS_MESSAGES } from '../../constants/successMessages.js';
+import { ERROR_MESSAGES } from '../../constants/errors/errorMessages.erros.js';
+import { SUCCESS_MESSAGES } from '../../constants/success/successMessages.js';
 
 export const getUsuarios = asyncHandler(async (req, res) => {
   const usuarios = await UsuarioModel.getAll();

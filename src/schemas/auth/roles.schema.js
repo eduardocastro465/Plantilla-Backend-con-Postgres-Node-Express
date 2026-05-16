@@ -1,32 +1,33 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { SCHEMA_ERRORS  } from '../../constants/errors/errorSchemas.errors.js';
 
 export const createRolSchema = z.object({
-    rol: z.string({ required_error: 'El rol es obligatorio' })
-        .min(3, 'El rol debe tener al menos 3 caracteres')
-        .max(30, 'El rol no puede exceder 30 caracteres'),
+    rol: z.string({ required_error: SCHEMA_ERRORS.ROL_REQUERIDO })
+        .min(3, SCHEMA_ERRORS.ROL_MIN(3))
+        .max(30, SCHEMA_ERRORS.ROL_MAX(30)),
     descripcion: z.string()
-        .max(250, 'La descripción no puede exceder 250 caracteres')
+        .max(250, SCHEMA_ERRORS.DESCRIPCION_MAX(250))
         .optional(),
     activo: z.boolean({
-        invalid_type_error: 'El campo activo debe ser verdadero o falso'
+        invalid_type_error: SCHEMA_ERRORS.ACTIVO_TIPO_INVALIDO
     }).default(true),
-}).strict()
+}).strict();
 
 export const rolUpdateSchema = z.object({
-    rol: z.string({ required_error: 'El rol es obligatorio' })
-        .min(3, 'El rol debe tener al menos 3 caracteres')
-        .max(30, 'El rol no puede exceder 30 caracteres'),
+    rol: z.string({ required_error: SCHEMA_ERRORS.ROL_REQUERIDO })
+        .min(3, SCHEMA_ERRORS.ROL_MIN(3))
+        .max(30, SCHEMA_ERRORS.ROL_MAX(30)),
     descripcion: z.string()
-        .max(250, 'La descripción no puede exceder 250 caracteres')
+        .max(250, SCHEMA_ERRORS.DESCRIPCION_MAX(250))
         .optional(),
     activo: z.boolean({
-        invalid_type_error: 'El campo activo debe ser verdadero o falso'
+        invalid_type_error: SCHEMA_ERRORS.ACTIVO_TIPO_INVALIDO
     }).optional(),
-}).strict()
+}).strict();
 
 export const rolToggleActivoSchema = z.object({
     activo: z.boolean({
-        required_error: 'El campo activo es obligatorio',
-        invalid_type_error: 'El campo activo debe ser verdadero o falso'
+        required_error: SCHEMA_ERRORS.ACTIVO_REQUERIDO,
+        invalid_type_error: SCHEMA_ERRORS.ACTIVO_TIPO_INVALIDO
     }),
-}).strict()
+}).strict();
