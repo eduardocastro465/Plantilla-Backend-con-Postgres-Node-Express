@@ -1,12 +1,11 @@
-import z from 'zod';
-
+import { z } from 'zod';
+import { SCHEMA_ERRORS } from '../../constants/errors/errorSchemas.errors.js';
 
 export const updateUsuarioSchema = z.object({
-    usuario: z.string({ required_error: 'El usuario es obligatorio' })
-        .min(3, 'El usuario debe tener al menos 3 caracteres')
-        .max(50, 'El usuario no puede exceder 50 caracteres'),
-
-    email: z.email({ required_error: 'El email es obligatorio' })
-        .min(5, 'El email debe tener al menos 5 caracteres')
-        .max(100, 'El email no puede exceder 100 caracteres')
+    usuario: z.string({ required_error: SCHEMA_ERRORS.USUARIO_REQUERIDO })
+        .min(3, SCHEMA_ERRORS.USUARIO_MIN(3))
+        .max(50, SCHEMA_ERRORS.USUARIO_MAX(50)),
+    email: z.email({ required_error: SCHEMA_ERRORS.EMAIL_REQUERIDO })
+        .min(5, SCHEMA_ERRORS.EMAIL_MIN(5))
+        .max(100, SCHEMA_ERRORS.EMAIL_MAX(100)),
 }).strict();

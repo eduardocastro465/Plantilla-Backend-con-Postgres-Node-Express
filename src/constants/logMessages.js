@@ -2,7 +2,6 @@
 // Aqui van los mensajes que se imprimen en consola al iniciar la aplicacion
 
 export const LOG_MESSAGES = {
-    // Base de datos
     DB_CONECTADA: (fecha) => [
         `   🚀 Base de datos conectada 💻`,
         ` Hora de conexión: ${fecha} `,
@@ -14,7 +13,6 @@ export const LOG_MESSAGES = {
 
     DB_ERROR_DESCONOCIDO: `Error desconocido`,
 
-    // Inicialización
     TABLAS_LISTAS: [
         `    📦 Tablas listas 📝`,
     ],
@@ -23,7 +21,6 @@ export const LOG_MESSAGES = {
         `Detalles: ${err}`,
     ],
 
-    // Servidor
     SERVIDOR_INICIADO: (port, production) => [
         ` 🌐 Servidor en modo ${production ? '🚀 Producción' : 'Desarrollo 💻'}`,
         ` 🔥 API: http://localhost:${port} 📦 `,

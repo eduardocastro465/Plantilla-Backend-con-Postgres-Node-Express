@@ -1,8 +1,8 @@
 // perfil_usuarios.controller.js
 import PerfilUsuarioModel from '../../models/user/PerfilUsuario.model.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
-import { ERROR_MESSAGES } from '../../constants/errorMessages.js';
-import { SUCCESS_MESSAGES } from '../../constants/successMessages.js';
+import { ERROR_MESSAGES } from '../../constants/errors/errorMessages.erros.js';
+import { SUCCESS_MESSAGES } from '../../constants/success/successMessages.js';
 
 export const getAllPerfiles = asyncHandler(async (req, res) => {
     const perfiles = await PerfilUsuarioModel.getAll();

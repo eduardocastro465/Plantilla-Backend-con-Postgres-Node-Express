@@ -1,100 +1,91 @@
 import { z } from 'zod';
+import { SCHEMA_ERRORS } from '../../constants/errors/errorSchemas.errors.js';
 
-// Esquema para registro de usuario
+const passwordSchema = z.string({ required_error: SCHEMA_ERRORS.PASSWORD_REQUERIDO })
+    .min(8, SCHEMA_ERRORS.PASSWORD_MIN(8))
+    .max(50, SCHEMA_ERRORS.PASSWORD_MAX(50))
+    .regex(/[A-Z]/, SCHEMA_ERRORS.PASSWORD_MAYUSCULA)
+    .regex(/[a-z]/, SCHEMA_ERRORS.PASSWORD_MINUSCULA)
+    .regex(/[0-9]/, SCHEMA_ERRORS.PASSWORD_NUMERO)
+    .regex(/[^A-Za-z0-9]/, SCHEMA_ERRORS.PASSWORD_SIMBOLO);
+
+const emailSchema = z.email({ required_error: SCHEMA_ERRORS.EMAIL_REQUERIDO })
+    .min(5, SCHEMA_ERRORS.EMAIL_MIN(5))
+    .max(100, SCHEMA_ERRORS.EMAIL_MAX(100));
+
 export const registerSchema = z.object({
     usuario: z.object({
-        usuario: z.string({ required_error: 'El nombre de usuario es obligatorio' })
-            .min(3, 'El nombre de usuario debe tener al menos 3 caracteres')
-            .max(30, 'El nombre de usuario no puede exceder 30 caracteres'),
-
-        email: z.email({ required_error: 'El email es obligatorio' })
-            .min(5, 'El email debe tener al menos 5 caracteres')
-            .max(100, 'El email no puede exceder 100 caracteres'),
-
-        password: z.string({ required_error: 'La contraseña es obligatoria' })
-            .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
-            .max(50, 'La nueva contraseña no puede exceder 50 caracteres')
-            .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-            .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-            .regex(/[0-9]/, 'Debe contener al menos un número')
-            .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un símbolo')
+        usuario: z.string({ required_error: SCHEMA_ERRORS.USUARIO_REQUERIDO })
+            .min(3, SCHEMA_ERRORS.USUARIO_MIN(3))
+            .max(30, SCHEMA_ERRORS.USUARIO_MAX(30)),
+        email: emailSchema,
+        password: passwordSchema,
     }),
-
     perfilUsuario: z.object({
-        nombre: z.string({ required_error: 'El nombre es obligatorio' })
-            .min(3, 'El nombre debe tener al menos 3 caracteres')
-            .max(30, 'El nombre no puede exceder 30 caracteres'),
-
-        apellido: z.string({ required_error: 'El apellido es obligatorio' })
-            .min(3, 'El apellido debe tener al menos 3 caracteres')
-            .max(50, 'El apellido no puede exceder 50 caracteres'),
-
-        telefono: z.string({ required_error: 'El teléfono es obligatorio' })
-            .regex(/^[0-9]{8,15}$/, 'Teléfono debe tener entre 8 y 15 dígitos'),
-
-        edad: z.number({ required_error: 'La edad es obligatoria' })
-            .int('La edad debe ser un número entero')
-            .positive('La edad debe ser un número positivo')
+        nombre: z.string({ required_error: SCHEMA_ERRORS.NOMBRE_REQUERIDO })
+            .min(3, SCHEMA_ERRORS.NOMBRE_MIN(3))
+            .max(30, SCHEMA_ERRORS.NOMBRE_MAX(30)),
+        apellido: z.string({ required_error: SCHEMA_ERRORS.APELLIDO_REQUERIDO })
+            .min(3, SCHEMA_ERRORS.APELLIDO_MIN(3))
+            .max(50, SCHEMA_ERRORS.APELLIDO_MAX(50)),
+        telefono: z.string({ required_error: SCHEMA_ERRORS.TELEFONO_REQUERIDO })
+            .regex(/^[0-9]{8,20}$/, SCHEMA_ERRORS.TELEFONO_FORMATO)
+            .optional(),
+        genero: z.string({ required_error: SCHEMA_ERRORS.GENERO_REQUERIDO })
+            .min(3, SCHEMA_ERRORS.GENERO_MIN(3))
+            .max(30, SCHEMA_ERRORS.GENERO_MAX(30))
+            .optional(),
+        fecha_nacimiento: z.date({ required_error: SCHEMA_ERRORS.FECHA_NACIMIENTO_REQUERIDO }),
+        pais: z.string({ required_error: SCHEMA_ERRORS.PAIS_REQUERIDO })
+            .min(3, SCHEMA_ERRORS.PAIS_MIN(3))
+            .max(60, SCHEMA_ERRORS.PAIS_MAX(60))
             .optional(),
     }).optional()
 }).strict();
 
-// Esquema para login (email o usuario + password)
 export const loginSchema = z.object({
-    email: z.email({ required_error: 'El email es obligatorio' })
-        .min(5, 'El email debe tener al menos 5 caracteres')
-        .max(100, 'El email no puede exceder 100 caracteres')
-        .optional(),
-
+    email: emailSchema.optional(),
     usuario: z.string()
-        .min(3, 'El usuario debe tener al menos 3 caracteres')
-        .max(30, 'El usuario no puede exceder 30 caracteres')
+        .min(3, SCHEMA_ERRORS.USUARIO_MIN(3))
+        .max(30, SCHEMA_ERRORS.USUARIO_MAX(30))
         .optional(),
-
-    password: z.string({ required_error: 'La contraseña es obligatoria' })
-        .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
-        .max(50, 'La nueva contraseña no puede exceder 50 caracteres')
-        .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-        .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-        .regex(/[0-9]/, 'Debe contener al menos un número')
-        .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un símbolo'),
+    password: passwordSchema,
 }).refine(data => data.email || data.usuario, {
-    message: 'Debe proporcionar email o usuario',
+    message: SCHEMA_ERRORS.EMAIL_O_USUARIO_REQUERIDO,
     path: ['email']
 });
 
-// Esquema para cambiar contraseña
 export const cambiarContrasenaSchema = z.object({
-    email: z.email({ required_error: 'El email es obligatorio' })
-        .min(5, 'El email debe tener al menos 5 caracteres')
-        .max(100, 'El email no puede exceder 100 caracteres')
-        .optional(),
-
+    email: emailSchema.optional(),
     usuario: z.string()
-        .min(3, 'El usuario debe tener al menos 3 caracteres')
-        .max(30, 'El usuario no puede exceder 30 caracteres')
+        .min(3, SCHEMA_ERRORS.USUARIO_MIN(3))
+        .max(30, SCHEMA_ERRORS.USUARIO_MAX(30))
         .optional(),
-
-    password: z.string({ required_error: 'La contraseña actual es obligatoria' })
-        .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
-        .max(50, 'La nueva contraseña no puede exceder 50 caracteres')
-    // .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-    // .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-    // .regex(/[0-9]/, 'Debe contener al menos un número')
-    // .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un símbolo')
-    ,
-
-    newPassword: z.string({ required_error: 'La nueva contraseña es obligatoria' })
-        .min(8, 'La nueva contraseña debe tener al menos 8 caracteres')
-        .max(50, 'La nueva contraseña no puede exceder 50 caracteres')
-        .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-        .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-        .regex(/[0-9]/, 'Debe contener al menos un número')
-        .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un símbolo')
+    password: z.string({ required_error: SCHEMA_ERRORS.PASSWORD_ACTUAL_REQUERIDO })
+        .min(8, SCHEMA_ERRORS.PASSWORD_MIN(8))
+        .max(50, SCHEMA_ERRORS.PASSWORD_MAX(50)),
+    newPassword: z.string({ required_error: SCHEMA_ERRORS.PASSWORD_NUEVA_REQUERIDO })
+        .min(8, SCHEMA_ERRORS.PASSWORD_MIN(8))
+        .max(50, SCHEMA_ERRORS.PASSWORD_MAX(50))
+        .regex(/[A-Z]/, SCHEMA_ERRORS.PASSWORD_MAYUSCULA)
+        .regex(/[a-z]/, SCHEMA_ERRORS.PASSWORD_MINUSCULA)
+        .regex(/[0-9]/, SCHEMA_ERRORS.PASSWORD_NUMERO)
+        .regex(/[^A-Za-z0-9]/, SCHEMA_ERRORS.PASSWORD_SIMBOLO),
 }).refine(data => data.email || data.usuario, {
-    message: 'Debe proporcionar email o usuario',
+    message: SCHEMA_ERRORS.EMAIL_O_USUARIO_REQUERIDO,
     path: ['email']
 }).refine(data => data.password !== data.newPassword, {
-    message: 'La nueva contraseña debe ser diferente a la actual',
+    message: SCHEMA_ERRORS.PASSWORD_DIFERENTE,
     path: ['newPassword']
+});
+
+export const enviarCodigoEmailSchema = z.object({
+    email: emailSchema,
+});
+
+export const verificarCodigoEmailSchema = z.object({
+    email: emailSchema,
+    codigo: z.string({ error: SCHEMA_ERRORS.CODIGO_REQUERIDO })
+        .length(6, SCHEMA_ERRORS.CODIGO_LENGTH(6))
+        .regex(/^[0-9]+$/, SCHEMA_ERRORS.CODIGO_SOLO_NUMEROS),
 });

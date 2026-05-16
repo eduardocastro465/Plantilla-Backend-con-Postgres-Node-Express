@@ -1,8 +1,9 @@
 import AuthModel from '../../models/auth/Auth.model.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import { ERROR_MESSAGES } from '../../constants/errorMessages.js';
-import { SUCCESS_MESSAGES } from '../../constants/successMessages.js';
+import { asyncHandler, throwError } from '../../utils/asyncHandler.js';
+import { ERROR_MESSAGES } from '../../constants/errors/errorMessages.erros.js';
+import { SUCCESS_MESSAGES } from '../../constants/success/successMessages.js';
 import { modoProduction } from '../../config.js';
+import { generarCodigo, sendEmail } from "../../services/email.js";
 
 
 export const verificarPermisos = asyncHandler(async (req, res) => {
@@ -14,6 +15,42 @@ export const verificarPermisos = asyncHandler(async (req, res) => {
         data: rol,
     });
 });
+
+export const enviarCodigoEmail = asyncHandler(async (req, res) => {
+
+    const { email } = req.body;
+
+    const codigo = generarCodigo();
+
+    const minutos = 10;
+    const expira_en = new Date(Date.now() + minutos * 60 * 1000);
+
+    await AuthModel.guardarCodigoCorreo(email, codigo, expira_en)
+    await sendEmail(email, codigo);
+
+    return res.status(200).json({
+        success: true,
+        message: SUCCESS_MESSAGES.Codigo_Enviado,
+    })
+
+})
+
+export const verificarCodigoEmail = asyncHandler(async (req, res) => {
+
+    const { email, codigo } = req.body;
+
+
+    const codigoVerificado = await AuthModel.verificarCodigoCorreo(email, codigo);
+
+    if (!codigoVerificado) throwError(ERROR_MESSAGES.CODIGO_INVALIDO, 400);
+
+    await AuthModel.marcarCodigoUsado(codigoVerificado.id);
+
+    return res.status(200).json({
+        success: true,
+        message: SUCCESS_MESSAGES.Codigo_Verificado,
+    });
+})
 
 export const register = asyncHandler(async (req, res) => {
     const { usuario, perfilUsuario } = req.body;

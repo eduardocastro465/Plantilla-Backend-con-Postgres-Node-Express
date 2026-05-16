@@ -8,9 +8,14 @@ export const SUCCESS_MESSAGES = {
     REGISTRO_EXITOSO: 'Usuario registrado exitosamente',
     CONTRASENA_CAMBIADA: 'Contraseña cambiada exitosamente',
 
+    // Correo
+    Codigo_Enviado: "Código enviado a tu correo correctamente",
+    Codigo_Verificado: 'Codigo verificado correctamente',
+
     // Usuarios
     USUARIO_ACTUALIZADO: 'Usuario actualizado exitosamente',
     USUARIO_ELIMINADO: 'Usuario eliminado exitosamente',
+    USUARIO_DESACTIVADO: 'Tu Usuario ha sido desactivado',
     USUARIO_CREADO: 'Usuario creado exitosamente',
 
     // Perfiles
@@ -34,4 +39,5 @@ export const SUCCESS_MESSAGES = {
     CREADO: (campo) => `${campo} creado exitosamente`,
     ACTUALIZADO: (campo) => `${campo} actualizado exitosamente`,
     ELIMINADO: (campo) => `${campo} eliminado exitosamente`,
+    
 };
