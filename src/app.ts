@@ -31,7 +31,6 @@ import rolesRoutes from "./routes/auth/roles.routes.js";
 import usuariosRoutes from "./routes/user/usuario.routes.js";
 import perfilUsuarioRoutes from "./routes/user/perfilUsuario.routes.js";
 import authGoogleRoutes from "./routes/auth/auth-google.routes.js";
-import videoRoutes from "./routes/video/video.routes.js";
 
 // Rutas de CORS Válidas
 const allowedOrigins = CORS_ORIGINS.split(",").map((origin) => origin.trim());
@@ -51,7 +50,7 @@ app.use(compression()); // Comprime las respuestas para ahorrar ancho de banda
 app.use(express.json({ limit: "50kb" })); // Protege contra payloads gigantes
 app.use(jsonErrorHandler);
 app.use(cookieParser()); // Para manejar las cookies
-app.use(express.urlencoded({ extended: true, limit: "500mb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan(modoProduction ? "combined" : "dev"));
 app.use(sanitizeHtml); // Limpia del codigo html malicioso de las peticiones
 
@@ -66,7 +65,6 @@ app.use(
 );
 app.use("/api/auth/google-auth", authGoogleRoutes);
 app.use("/api/logs", verifyToken, autorizar(ROLES.Administrator), logRoutes);
-app.use("/api/videos", verifyToken, videoRoutes);
 app.use(
   "/api/usuarios/perfiles",
   verifyToken,
@@ -85,14 +83,10 @@ app.use(errorHandler);
 // Inicializar base de datos
 await initDb();
 
-const server = app.listen(PORT, () =>
+app.listen(PORT, () =>
   textoColorido(
     LOG_MESSAGES.SERVIDOR_INICIADO(PORT, modoProduction),
     ["rgb(33, 97, 235)", "rgb(46, 15, 183)"],
     modoProduction,
   ),
 );
-
-server.timeout = 30 * 60 * 1000;
-server.keepAliveTimeout = 30 * 60 * 1000;
-server.headersTimeout = 31 * 60 * 1000;
